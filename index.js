@@ -1,12 +1,14 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
+const routes = require("./routes/routes");
 const cors = require("cors");
 
 const app = express();
+const port = process.env.PORT || 8000;
 
-const mongoString = process.env.DATABASE_URL;
-mongoose.connect(mongoString);
+mongoose.connect(process.env.DATABASE_URL);
+
 const database = mongoose.connection;
 database.on("error", (error) => {
   console.log(error);
@@ -18,7 +20,6 @@ database.once("connected", () => {
 
 app.use(cors());
 
-app.listen(() => console.log(`it's alive on http://localhost:${mongoString}`));
+app.listen(() => console.log(`it's alive on http://localhost:${port}`));
 
-const routes = require("./routes/routes");
-app.use("/api/", routes);
+app.use("/api", routes);

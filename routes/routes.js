@@ -1,18 +1,13 @@
 const express = require("express");
+const heroController = require("../Controllers/HeroController.js");
 
 const router = express.Router();
 
-module.exports = router;
-
 //Post Method
-router.post("/post", (req, res) => {
-  res.send("Post API");
-});
+router.post("/add", heroController.addHero);
 
 //Get all Method
-router.get("/getAll", (req, res) => {
-  res.send("Get All API");
-});
+router.get("/getAll", heroController.getAllHeroes);
 
 //Get by ID Method
 router.get("/getOne/:id", (req, res) => {
@@ -28,3 +23,5 @@ router.patch("/update/:id", (req, res) => {
 router.delete("/delete/:id", (req, res) => {
   res.send("Delete by ID API");
 });
+
+module.exports = router;
