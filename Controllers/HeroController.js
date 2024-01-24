@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const heroModel = require("../Models/heroModel.js");
 
+// POST
 const addHero = async (req, res) => {
   const hero = new heroModel({
     _id: new mongoose.Types.ObjectId(),
@@ -14,6 +15,7 @@ const addHero = async (req, res) => {
   }
 };
 
+//GetAll
 const getAllHeroes = async (req, res) => {
   try {
     const heroes = await heroModel.find();
@@ -23,6 +25,7 @@ const getAllHeroes = async (req, res) => {
   }
 };
 
+//getById
 const getHeroById = async (req, res) => {
   const id = req.params.id;
   try {
@@ -37,6 +40,7 @@ const getHeroById = async (req, res) => {
   }
 };
 
+//Put
 const updateHero = async (req, res) => {
   const id = req.params.id;
   try {
@@ -55,6 +59,7 @@ const updateHero = async (req, res) => {
   }
 };
 
+//Delete
 const deleteHero = async (req, res) => {
   const id = req.params.id;
   try {
