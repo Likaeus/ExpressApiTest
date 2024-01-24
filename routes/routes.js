@@ -10,18 +10,12 @@ router.post("/add", heroController.addHero);
 router.get("/getAll", heroController.getAllHeroes);
 
 //Get by ID Method
-router.get("/getOne/:id", (req, res) => {
-  res.send("Get by ID API");
-});
+router.get("/getOne/:id", heroController.getHeroById);
 
 //Update by ID Method
-router.patch("/update/:id", (req, res) => {
-  res.send("Update by ID API");
-});
+router.put("/update/:id", heroController.updateHero);
 
 //Delete by ID Method
-router.delete("/delete/:id", (req, res) => {
-  res.send("Delete by ID API");
-});
+router.delete("/delete/:id", heroController.deleteHero);
 
 module.exports = router;

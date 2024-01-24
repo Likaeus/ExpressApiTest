@@ -1,10 +1,13 @@
 const mongoose = require("mongoose");
 
-const heroSchema = new mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId,
-  name: {
-    required: true,
-    type: String,
+const heroSchema = new mongoose.Schema(
+  {
+    _id: mongoose.Schema.Types.ObjectId,
+    Name: {
+      type: String,
+      required: true,
+    },
   },
-});
-module.exports = mongoose.model("heroData", heroSchema);
+  { versionKey: false }
+);
+module.exports = mongoose.model("heroes", heroSchema, "Heroes");

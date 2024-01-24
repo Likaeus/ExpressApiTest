@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
-const heroData = require("../Models/heroModel.js");
+const heroModel = require("../Models/heroModel.js");
 
 const addHero = async (req, res) => {
-  const hero = new heroData({
+  const hero = new heroModel({
     _id: new mongoose.Types.ObjectId(),
-    name: req.body.name,
+    Name: req.body.Name,
   });
   try {
     const result = await hero.save();
@@ -15,12 +15,55 @@ const addHero = async (req, res) => {
 };
 
 const getAllHeroes = async (req, res) => {
-  heroData.find().then((heroes) =>
-    res
-      .status(200)
-      .json(heroes)
-      .catch((err) => res.status(500).json({ error: err }))
-  );
+  try {
+    const heroes = await heroModel.find();
+    res.status(200).json(heroes);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
-module.exports = { addHero, getAllHeroes };
+const getHeroById = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const hero = await heroModel.findById(id);
+
+    if (!hero) {
+      return res.status(400).json({ message: "Hero not Found" });
+    }
+    res.status(200).json(hero);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const updateHero = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const updatedHero = await heroModel.updateOne(
+      { _id: id },
+      { $set: { Name: req.body.Name } }
+    );
+
+    if (updatedHero.n === 0) {
+      return res.status(404).json({ message: "Hero not found" });
+    }
+
+    res.status(200).json(updatedHero);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const deleteHero = async (req, res) => {
+  const id = req.params.id;
+  try {
+    heroModel
+      .deleteOne({ _id: id })
+      .then((deleteHero) => res.status(200).json(deleteHero));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+module.exports = { addHero, getAllHeroes, getHeroById, updateHero, deleteHero };
