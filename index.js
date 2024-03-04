@@ -5,8 +5,10 @@ const routes = require("./routes/routes");
 const cors = require("cors");
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
+const fileUpload = require("express-fileupload");
 
 const app = express();
+app.use(fileUpload());
 const port = process.env.PORT || 8000;
 
 mongoose.connect(process.env.DATABASE_URL);

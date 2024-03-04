@@ -7,7 +7,12 @@ const heroSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    Description: {
+      type: String,
+      required: true,
+    },
   },
+
   { versionKey: false }
 );
 module.exports = mongoose.model("heroes", heroSchema, "Heroes");
