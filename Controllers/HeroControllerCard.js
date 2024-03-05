@@ -86,10 +86,6 @@ const updateHeroCard = async (req, res) => {
             Powers: req.body.Details.Powers,
             Weakness: req.body.Details.Weakness,
           },
-          Image: {
-            data: req.body.Image.data,
-            contentType: req.body.Image.contentType,
-          },
         },
       },
       { new: true }
