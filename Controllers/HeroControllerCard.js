@@ -71,6 +71,21 @@ const getHeroCardById = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+const getHeroImageById = async (req, res) => {
+  try {
+    const hero = await heroCardModel.findById(req.params.id);
+
+    if (!hero || !hero.Image) {
+      return res.status(404).json({ message: "Imagen no encontrada" });
+    }
+
+    res.set("Content-Type", hero.Image.contentType);
+    res.send(hero.Image.data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
 
 //Put
 const updateHeroCard = async (req, res) => {
@@ -120,4 +135,5 @@ module.exports = {
   getHeroCardById,
   updateHeroCard,
   deleteHeroCard,
+  getHeroImageById,
 };

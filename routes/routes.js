@@ -4,20 +4,20 @@ const HeroControllerCard = require("../Controllers/HeroControllerCard.js");
 
 const router = express.Router();
 
-//Post Method
-router.post("/add", heroController.addHero);
+// //Post Method
+// router.post("/add", heroController.addHero);
 
-//Get all Method
-router.get("/getAll", heroController.getAllHeroes);
+// //Get all Method
+// router.get("/getAll", heroController.getAllHeroes);
 
-//Get by ID Method
-router.get("/getOne/:id", heroController.getHeroById);
+// //Get by ID Method
+// router.get("/getOne/:id", heroController.getHeroById);
 
-//Update by ID Method
-router.put("/update/:id", heroController.updateHero);
+// //Update by ID Method
+// router.put("/update/:id", heroController.updateHero);
 
-//Delete by ID Method
-router.delete("/delete/:id", heroController.deleteHero);
+// //Delete by ID Method
+// router.delete("/delete/:id", heroController.deleteHero);
 
 //Post Method
 // Ruta para manejar el texto
@@ -31,6 +31,8 @@ router.get("/getAllCards", HeroControllerCard.getAllHeroCards);
 
 //Get by ID Method
 router.get("/getOneCard/:id", HeroControllerCard.getHeroCardById);
+
+router.get("/image/:id", HeroControllerCard.getHeroImageById);
 
 //Update by ID Method
 router.put("/updateCard/:id", HeroControllerCard.updateHeroCard);
