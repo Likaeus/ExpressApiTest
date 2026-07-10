@@ -9,12 +9,10 @@ const config = require("../../src/config");
 let connectionPromise = null;
 
 async function connectToDatabase() {
-  // 1 significa que Mongoose ya está conectado
   if (mongoose.connection.readyState === 1) {
     return;
   }
 
-  // Evita crear varias conexiones al mismo tiempo
   if (!connectionPromise) {
     connectionPromise = mongoose.connect(config.databaseUrl).catch((error) => {
       connectionPromise = null;
@@ -25,9 +23,7 @@ async function connectToDatabase() {
   await connectionPromise;
 }
 
-const expressHandler = serverless(app, {
-  basePath: "/.netlify/functions/api",
-});
+const expressHandler = serverless(app);
 
 exports.handler = async (event, context) => {
   context.callbackWaitsForEmptyEventLoop = false;
