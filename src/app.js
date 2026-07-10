@@ -3,7 +3,7 @@ const cors = require("cors");
 const morgan = require("morgan");
 const fileUpload = require("express-fileupload");
 const helmet = require("helmet");
-const { rateLimit, ipKeyGenerator } = require("express-rate-limit");
+const { rateLimit } = require("express-rate-limit");
 const config = require("./config");
 const heroRoutes = require("./routes/heroRoutes");
 const authRoutes = require("./routes/authRoutes");
@@ -13,6 +13,7 @@ const { notFound, errorHandler } = require("./middleware/errorHandler");
 const app = express();
 
 app.disable("x-powered-by");
+app.set("trust proxy", config.trustProxy);
 app.use(helmet());
 app.use(morgan(config.nodeEnv === "production" ? "combined" : "dev"));
 app.use(cors({ origin: config.corsOrigin }));
@@ -31,20 +32,6 @@ app.use(
     limit: 300,
     standardHeaders: "draft-8",
     legacyHeaders: false,
-
-    keyGenerator: (req) => {
-      const forwardedFor = req.headers["x-forwarded-for"];
-
-      const forwardedIp =
-        typeof forwardedFor === "string"
-          ? forwardedFor.split(",")[0].trim()
-          : undefined;
-
-      const clientIp =
-        req.ip || req.socket?.remoteAddress || forwardedIp || "127.0.0.1";
-
-      return ipKeyGenerator(clientIp);
-    },
 
     message: {
       error: {

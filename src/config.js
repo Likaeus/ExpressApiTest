@@ -2,6 +2,9 @@ const port = Number.parseInt(process.env.PORT || "8000", 10);
 const databaseUrl = process.env.DATABASE_URL;
 const jwtSecret = process.env.JWT_SECRET;
 const corsOrigin = (process.env.CORS_ORIGIN || "*").trim().replace(/\/+$/, "");
+const isServerlessRuntime = Boolean(
+  process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.NETLIFY || process.env.NETLIFY_DEV
+);
 
 if (!databaseUrl) {
   throw new Error("DATABASE_URL environment variable is required");
@@ -24,5 +27,6 @@ module.exports = {
   userCollectionName: process.env.USER_COLLECTION_NAME || "User_Info",
   nodeEnv: process.env.NODE_ENV || "development",
   corsOrigin,
+  trustProxy: isServerlessRuntime ? 1 : false,
   maxImageSize: 5 * 1024 * 1024,
 };
