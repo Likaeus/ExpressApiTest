@@ -18,4 +18,4 @@ const heroCardSchema = new mongoose.Schema(
 
 heroCardSchema.index({ Name: 1 });
 
-module.exports = mongoose.model("HeroCard", heroCardSchema, "HeroesCard");
+module.exports = mongoose.model("HeroCard", heroCardSchema, "HeroesCards");

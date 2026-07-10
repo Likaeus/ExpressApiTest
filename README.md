@@ -15,7 +15,7 @@ API REST construida con Express y MongoDB para administrar tarjetas de héroes e
 
 La API escucha por defecto en `http://localhost:8000`. Su estado puede comprobarse con `GET /health`.
 
-Los héroes se almacenan en `Characters.HeroesCard`. Las cuentas se almacenan separadamente en `Users.User_Info` dentro del mismo clúster.
+Los héroes se almacenan en `Characters.HeroesCards`. Las cuentas se almacenan separadamente en `Users.User_Info` dentro del mismo clúster.
 
 `JWT_SECRET` es obligatorio y debe ser un valor aleatorio de al menos 32 caracteres. No reutilices contraseñas ni publiques el archivo `.env`.
 
