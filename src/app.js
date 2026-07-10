@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const fileUpload = require("express-fileupload");
 const helmet = require("helmet");
 const { rateLimit } = require("express-rate-limit");
+const rateLimitKey = require("./middleware/rateLimitKey");
 const config = require("./config");
 const heroRoutes = require("./routes/heroRoutes");
 const authRoutes = require("./routes/authRoutes");
@@ -32,6 +33,7 @@ app.use(
     limit: 300,
     standardHeaders: "draft-8",
     legacyHeaders: false,
+    keyGenerator: rateLimitKey,
 
     message: {
       error: {

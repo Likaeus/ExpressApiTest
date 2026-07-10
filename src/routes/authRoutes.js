@@ -4,6 +4,7 @@ const controller = require("../controllers/authController");
 const asyncHandler = require("../middleware/asyncHandler");
 const authenticate = require("../middleware/authenticate");
 const { validateCredentials, validateRegistration } = require("../middleware/validateAuth");
+const rateLimitKey = require("../middleware/rateLimitKey");
 
 const router = express.Router();
 const authLimiter = rateLimit({
@@ -11,6 +12,7 @@ const authLimiter = rateLimit({
   limit: 10,
   standardHeaders: "draft-8",
   legacyHeaders: false,
+  keyGenerator: rateLimitKey,
   message: { error: { code: "TOO_MANY_ATTEMPTS", message: "Try again later" } },
 });
 

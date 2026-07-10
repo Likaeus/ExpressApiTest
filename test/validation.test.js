@@ -3,6 +3,7 @@ const assert = require("node:assert/strict");
 const { normalizeHeroPayload, validateHero } = require("../src/middleware/validateHero");
 const { validateCredentials, validateRegistration } = require("../src/middleware/validateAuth");
 const bcrypt = require("bcryptjs");
+const rateLimitKey = require("../src/middleware/rateLimitKey");
 
 test("normalizes both the new and legacy payload formats", () => {
   assert.deepEqual(normalizeHeroPayload({
@@ -65,4 +66,12 @@ test("bcrypt hashes are salted and verifiable", async () => {
   assert.notEqual(first, second);
   assert.equal(await bcrypt.compare(password, first), true);
   assert.equal(await bcrypt.compare("wrong-password", first), false);
+});
+
+test("rate limit key uses Netlify forwarding headers and never returns undefined", () => {
+  assert.equal(
+    rateLimitKey({ headers: { "x-forwarded-for": "203.0.113.42, 10.0.0.1" } }),
+    "203.0.113.42"
+  );
+  assert.equal(rateLimitKey({ headers: {}, socket: {} }), "unknown-client");
 });
