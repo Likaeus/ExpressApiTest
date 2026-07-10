@@ -1,17 +1,24 @@
 {
+  "name": "heroes-api",
+  "version": "1.0.0",
+  "description": "REST API for managing hero cards and images",
+  "main": "index.js",
+  "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
-    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.2",
     "express": "^4.18.2",
     "express-fileupload": "^1.4.3",
     "mongoose": "^8.1.0",
-    "morgan": "^1.10.0",
-    "multer": "^1.4.5-lts.1"
+    "morgan": "^1.10.0"
   },
   "scripts": {
+    "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "jest"
+    "test": "node --test"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"

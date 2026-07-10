@@ -1,33 +1,34 @@
 require("dotenv").config();
-const express = require("express");
+
 const mongoose = require("mongoose");
-const routes = require("./routes/routes");
-const cors = require("cors");
-const morgan = require("morgan");
-const bodyParser = require("body-parser");
-const fileUpload = require("express-fileupload");
+const app = require("./src/app");
+const config = require("./src/config");
 
-const app = express();
-app.use(fileUpload());
-const port = process.env.PORT || 8000;
+let server;
 
-mongoose.connect(process.env.DATABASE_URL);
+async function start() {
+  try {
+    await mongoose.connect(config.databaseUrl);
+    console.log("Database connected");
 
-app.use(morgan("dev"));
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+    server = app.listen(config.port, () => {
+      console.log(`API listening on http://localhost:${config.port}`);
+    });
+  } catch (error) {
+    console.error("Could not start the API:", error.message);
+    process.exitCode = 1;
+  }
+}
 
-app.use(cors());
+async function shutdown(signal) {
+  console.log(`${signal} received. Shutting down...`);
+  if (server) {
+    await new Promise((resolve) => server.close(resolve));
+  }
+  await mongoose.connection.close();
+}
 
-app.use("/api", routes);
+process.on("SIGINT", () => shutdown("SIGINT").finally(() => process.exit(0)));
+process.on("SIGTERM", () => shutdown("SIGTERM").finally(() => process.exit(0)));
 
-const database = mongoose.connection;
-database.on("error", (error) => {
-  console.log(error);
-});
-
-database.once("connected", () => {
-  console.log("Database Connected");
-});
-
-app.listen(port, () => console.log(`it's alive on http://localhost:${port}`));
+start();

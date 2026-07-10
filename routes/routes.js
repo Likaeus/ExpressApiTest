@@ -1,43 +1,20 @@
 const express = require("express");
-const heroController = require("../Controllers/HeroController.js");
-const HeroControllerCard = require("../Controllers/HeroControllerCard.js");
+const controller = require("../src/controllers/heroController");
+const asyncHandler = require("../src/middleware/asyncHandler");
+const { validateHero } = require("../src/middleware/validateHero");
 
 const router = express.Router();
 
-// //Post Method
-// router.post("/add", heroController.addHero);
-
-// //Get all Method
-// router.get("/getAll", heroController.getAllHeroes);
-
-// //Get by ID Method
-// router.get("/getOne/:id", heroController.getHeroById);
-
-// //Update by ID Method
-// router.put("/update/:id", heroController.updateHero);
-
-// //Delete by ID Method
-// router.delete("/delete/:id", heroController.deleteHero);
-
-//Post Method
-// Ruta para manejar el texto
-router.post("/addCharacter", HeroControllerCard.addHeroText);
-
-// Ruta para manejar la carga de la imagen
-router.post("/addCharacter/image", HeroControllerCard.addHeroImage);
-
-//Get all Method
-router.get("/getAllCards", HeroControllerCard.getAllHeroCards);
-
-//Get by ID Method
-router.get("/getOneCard/:id", HeroControllerCard.getHeroCardById);
-
-router.get("/image/:id", HeroControllerCard.getHeroImageById);
-
-//Update by ID Method
-router.put("/updateCard/:id", HeroControllerCard.updateHeroCard);
-
-//Delete by ID Method
-router.delete("/deleteCard/:id", HeroControllerCard.deleteHeroCard);
+// Deprecated compatibility routes. New clients should use /api/v1/heroes.
+router.post("/addCharacter", validateHero, asyncHandler(controller.create));
+router.post("/addCharacter/image", (req, res, next) => {
+  req.params.id = req.body._id;
+  return asyncHandler(controller.uploadImage)(req, res, next);
+});
+router.get("/getAllCards", asyncHandler(controller.list));
+router.get("/getOneCard/:id", asyncHandler(controller.getOne));
+router.get("/image/:id", asyncHandler(controller.getImage));
+router.put("/updateCard/:id", validateHero, asyncHandler(controller.update));
+router.delete("/deleteCard/:id", asyncHandler(controller.remove));
 
 module.exports = router;
