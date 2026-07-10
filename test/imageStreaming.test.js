@@ -7,6 +7,7 @@ const {
   imageBuffer,
   bufferStream,
 } = require("../src/netlify/imageStreaming");
+const { normalizeLambdaResponse } = require("../src/netlify/lambdaResponse");
 
 test("recognizes image routes behind the direct Netlify function URL", () => {
   const id = "6a504fe66d4f5e6e92798389";
@@ -29,4 +30,14 @@ test("streams a buffer in bounded chunks without changing its bytes", async () =
 
   assert.equal(chunks.length, 3);
   assert.deepEqual(Buffer.concat(chunks), source);
+});
+
+test("removes bodies that the Fetch Response API forbids", () => {
+  const preflight = normalizeLambdaResponse({ statusCode: 204, body: "", headers: { vary: "Origin" } });
+  assert.equal(preflight.body, null);
+  assert.equal(preflight.isBase64Encoded, false);
+  assert.deepEqual(preflight.headers, { vary: "Origin" });
+
+  const regular = { statusCode: 200, body: "{}" };
+  assert.equal(normalizeLambdaResponse(regular), regular);
 });

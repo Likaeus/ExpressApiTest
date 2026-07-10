@@ -8,8 +8,10 @@ import app from "../../src/app.js";
 import config from "../../src/config.js";
 import Hero from "../../Models/HeroCardModel.js";
 import imageStreaming from "../../src/netlify/imageStreaming.js";
+import lambdaResponse from "../../src/netlify/lambdaResponse.js";
 
 const { imageIdFromPath, corsHeaders, imageBuffer, bufferStream } = imageStreaming;
+const { normalizeLambdaResponse } = lambdaResponse;
 
 let connectionPromise = null;
 
@@ -43,7 +45,8 @@ const legacyHandler = withLambda(async (event, context) => {
     await connectToDatabase();
   }
 
-  return expressHandler(event, context);
+  const response = await expressHandler(event, context);
+  return normalizeLambdaResponse(response);
 });
 
 async function streamHeroImage(request, imageId) {
