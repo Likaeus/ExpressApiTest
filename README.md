@@ -15,17 +15,47 @@ API REST construida con Express y MongoDB para administrar tarjetas de héroes e
 
 La API escucha por defecto en `http://localhost:8000`. Su estado puede comprobarse con `GET /health`.
 
+Los héroes se almacenan en `Characters.HeroesCard`. Las cuentas se almacenan separadamente en `Users.User_Info` dentro del mismo clúster.
+
+`JWT_SECRET` es obligatorio y debe ser un valor aleatorio de al menos 32 caracteres. No reutilices contraseñas ni publiques el archivo `.env`.
+
+## Autenticación
+
+| Método | Ruta | Acción |
+| --- | --- | --- |
+| POST | `/api/v1/auth/register` | Crear una cuenta e iniciar sesión |
+| POST | `/api/v1/auth/login` | Iniciar sesión |
+| GET | `/api/v1/auth/me` | Obtener la cuenta autenticada |
+
+Registro:
+
+```json
+{
+  "name": "Usuario",
+  "email": "usuario@example.com",
+  "password": "UnaClaveSegura123"
+}
+```
+
+El login recibe `email` y `password` y devuelve un `accessToken`. Para crear, modificar o eliminar héroes, envíalo en cada petición:
+
+```http
+Authorization: Bearer ACCESS_TOKEN
+```
+
+Los tokens expiran por defecto en 15 minutos. Las contraseñas se procesan con bcrypt y nunca se guardan ni se devuelven en texto plano.
+
 ## API v1
 
 | Método | Ruta | Acción |
 | --- | --- | --- |
 | GET | `/api/v1/heroes?page=1&limit=20&search=storm` | Lista paginada |
-| POST | `/api/v1/heroes` | Crear un héroe |
+| POST | `/api/v1/heroes` | Crear un héroe (autenticado) |
 | GET | `/api/v1/heroes/:id` | Obtener un héroe |
-| PUT | `/api/v1/heroes/:id` | Reemplazar sus datos |
-| DELETE | `/api/v1/heroes/:id` | Eliminarlo |
+| PUT | `/api/v1/heroes/:id` | Reemplazar sus datos (autenticado) |
+| DELETE | `/api/v1/heroes/:id` | Eliminarlo (autenticado) |
 | GET | `/api/v1/heroes/:id/image` | Obtener su imagen |
-| PUT | `/api/v1/heroes/:id/image` | Agregar o reemplazar su imagen |
+| PUT | `/api/v1/heroes/:id/image` | Agregar o reemplazar su imagen (autenticado) |
 
 Ejemplo JSON para crear o actualizar:
 

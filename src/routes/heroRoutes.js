@@ -2,18 +2,19 @@ const express = require("express");
 const controller = require("../controllers/heroController");
 const asyncHandler = require("../middleware/asyncHandler");
 const { validateHero } = require("../middleware/validateHero");
+const authenticate = require("../middleware/authenticate");
 
 const router = express.Router();
 
 router.route("/")
   .get(asyncHandler(controller.list))
-  .post(validateHero, asyncHandler(controller.create));
+  .post(authenticate, validateHero, asyncHandler(controller.create));
 router.route("/:id")
   .get(asyncHandler(controller.getOne))
-  .put(validateHero, asyncHandler(controller.update))
-  .delete(asyncHandler(controller.remove));
+  .put(authenticate, validateHero, asyncHandler(controller.update))
+  .delete(authenticate, asyncHandler(controller.remove));
 router.route("/:id/image")
   .get(asyncHandler(controller.getImage))
-  .put(asyncHandler(controller.uploadImage));
+  .put(authenticate, asyncHandler(controller.uploadImage));
 
 module.exports = router;

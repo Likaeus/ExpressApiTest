@@ -20,6 +20,10 @@ function errorHandler(error, req, res, next) {
   } else if (error instanceof mongoose.Error.ValidationError) {
     status = 422;
     code = "VALIDATION_ERROR";
+  } else if (error.code === 11000) {
+    status = 409;
+    code = "CONFLICT";
+    message = "The resource already exists";
   }
 
   if (status >= 500) console.error(error);
