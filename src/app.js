@@ -8,6 +8,7 @@ const rateLimitKey = require("./middleware/rateLimitKey");
 const config = require("./config");
 const heroRoutes = require("./routes/heroRoutes");
 const authRoutes = require("./routes/authRoutes");
+const campaignRoutes = require("./routes/campaignRoutes");
 const legacyRoutes = require("../routes/routes");
 const { notFound, errorHandler } = require("./middleware/errorHandler");
 
@@ -23,7 +24,7 @@ app.use(express.urlencoded({ extended: false, limit: "100kb" }));
 app.use(
   fileUpload({
     abortOnLimit: true,
-    limits: { fileSize: config.maxImageSize },
+    limits: { fileSize: config.maxMapSize },
     safeFileNames: true,
   }),
 );
@@ -50,6 +51,7 @@ app.get("/health", (req, res) => {
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/heroes", heroRoutes);
+app.use("/api/v1/campaigns", campaignRoutes);
 app.use("/api", legacyRoutes);
 app.use(notFound);
 app.use(errorHandler);

@@ -7,6 +7,7 @@ import serverless from "serverless-http";
 import app from "../../src/app.js";
 import config from "../../src/config.js";
 import Hero from "../../Models/HeroCardModel.js";
+import Campaign from "../../src/models/Campaign.js";
 import imageStreaming from "../../src/netlify/imageStreaming.js";
 import lambdaResponse from "../../src/netlify/lambdaResponse.js";
 
@@ -95,10 +96,53 @@ async function streamHeroImage(request, imageId) {
   }
 }
 
+function campaignPreviewId(pathname) {
+  return pathname.match(/\/api\/v1\/campaigns\/([a-f\d]{24})\/map\/preview\/?$/i)?.[1] || null;
+}
+
+async function streamCampaignPreview(request, campaignId) {
+  const headers = {
+    ...corsHeaders(request.headers.get("origin"), config.corsOrigin),
+    "Cross-Origin-Resource-Policy": "cross-origin",
+  };
+  if (request.method === "OPTIONS") return new Response(null, { status: 204, headers });
+  try {
+    await connectToDatabase();
+    const campaign = await Campaign.findOne({ _id: campaignId, visibility: "public" })
+      .select("+mapAssets.preview.data mapAssets.preview.contentType updatedAt").lean();
+    if (!campaign?.mapAssets?.preview?.data) return Response.json(
+      { error: { code: "MAP_NOT_FOUND", message: "Map preview not found" } },
+      { status: 404, headers },
+    );
+    const bytes = imageBuffer(campaign.mapAssets.preview.data);
+    const etag = `"${campaign._id}-${new Date(campaign.updatedAt || 0).getTime()}-${bytes.length}"`;
+    const mapHeaders = {
+      ...headers,
+      "Content-Type": "image/svg+xml",
+      "Content-Length": String(bytes.length),
+      "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
+      "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; font-src data:",
+      ETag: etag,
+    };
+    if (request.headers.get("if-none-match") === etag) return new Response(null, { status: 304, headers: mapHeaders });
+    if (request.method === "HEAD") return new Response(null, { status: 200, headers: mapHeaders });
+    return new Response(bufferStream(bytes), { status: 200, headers: mapHeaders });
+  } catch (error) {
+    console.error("Could not stream campaign map:", error);
+    return Response.json({ error: { code: "MAP_DELIVERY_FAILED", message: "Could not load map" } }, { status: 500, headers });
+  }
+}
+
 export default async function handler(request, context) {
-  const imageId = imageIdFromPath(new URL(request.url).pathname);
+  const pathname = new URL(request.url).pathname;
+  const imageId = imageIdFromPath(pathname);
   if (imageId && ["GET", "HEAD", "OPTIONS"].includes(request.method)) {
     return streamHeroImage(request, imageId);
+  }
+
+  const campaignId = campaignPreviewId(pathname);
+  if (campaignId && ["GET", "HEAD", "OPTIONS"].includes(request.method)) {
+    return streamCampaignPreview(request, campaignId);
   }
 
   return legacyHandler(request, context);

@@ -57,6 +57,7 @@ async function create(req, res) {
   const image = req.files?.image || req.files?.Image;
 
   if (image) {
+    if (image.size > 5 * 1024 * 1024) return res.status(413).json({ error: { code: "IMAGE_TOO_LARGE", message: "Image exceeds 5 MB" } });
     if (!ALLOWED_IMAGE_TYPES.has(image.mimetype)) {
       return res.status(415).json({
         error: { code: "UNSUPPORTED_IMAGE", message: "Use JPEG, PNG, WebP or GIF" },
@@ -135,6 +136,7 @@ async function remove(req, res) {
 async function uploadImage(req, res) {
   const image = req.files?.image || req.files?.Image;
   if (!image) return res.status(422).json({ error: { code: "IMAGE_REQUIRED", message: "An image file is required" } });
+  if (image.size > 5 * 1024 * 1024) return res.status(413).json({ error: { code: "IMAGE_TOO_LARGE", message: "Image exceeds 5 MB" } });
   if (!ALLOWED_IMAGE_TYPES.has(image.mimetype)) {
     return res.status(415).json({ error: { code: "UNSUPPORTED_IMAGE", message: "Use JPEG, PNG, WebP or GIF" } });
   }

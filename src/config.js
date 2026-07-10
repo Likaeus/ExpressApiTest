@@ -25,8 +25,12 @@ module.exports = {
   jwtAudience: "heroes-web",
   userDatabaseName: process.env.USER_DATABASE_NAME || "Users",
   userCollectionName: process.env.USER_COLLECTION_NAME || "User_Info",
+  campaignDatabaseName: process.env.CAMPAIGN_DATABASE_NAME || "Campaign",
+  campaignCollectionName: process.env.CAMPAIGN_COLLECTION_NAME || "Campaigns",
   nodeEnv: process.env.NODE_ENV || "development",
   corsOrigin,
   trustProxy: isServerlessRuntime ? 1 : false,
   maxImageSize: 5 * 1024 * 1024,
+  maxMapSize: 4 * 1024 * 1024,
+  maxMapUploadSize: Math.floor(4.25 * 1024 * 1024),
 };

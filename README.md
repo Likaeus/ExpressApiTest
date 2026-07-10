@@ -17,6 +17,8 @@ La API escucha por defecto en `http://localhost:8000`. Su estado puede comprobar
 
 Los héroes se almacenan en `Characters.HeroesCards`. Las cuentas se almacenan separadamente en `Users.User_Info` dentro del mismo clúster.
 
+Las campañas se almacenan en `Campaign.Campaigns`. Los nombres de base de datos y colección pueden ajustarse con `CAMPAIGN_DATABASE_NAME` y `CAMPAIGN_COLLECTION_NAME`.
+
 `JWT_SECRET` es obligatorio y debe ser un valor aleatorio de al menos 32 caracteres. No reutilices contraseñas ni publiques el archivo `.env`.
 
 ## Autenticación
