@@ -1,6 +1,7 @@
 const port = Number.parseInt(process.env.PORT || "8000", 10);
 const databaseUrl = process.env.DATABASE_URL;
 const jwtSecret = process.env.JWT_SECRET;
+const corsOrigin = (process.env.CORS_ORIGIN || "*").trim().replace(/\/+$/, "");
 
 if (!databaseUrl) {
   throw new Error("DATABASE_URL environment variable is required");
@@ -22,6 +23,6 @@ module.exports = {
   userDatabaseName: process.env.USER_DATABASE_NAME || "Users",
   userCollectionName: process.env.USER_COLLECTION_NAME || "User_Info",
   nodeEnv: process.env.NODE_ENV || "development",
-  corsOrigin: process.env.CORS_ORIGIN || "*",
+  corsOrigin,
   maxImageSize: 5 * 1024 * 1024,
 };
