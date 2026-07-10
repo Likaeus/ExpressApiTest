@@ -6,7 +6,7 @@ NODE_VERSION = "20"
 
 [functions]
   directory = "netlify/functions"
-  external_node_modules = ["express", "bcryptjs"]
+  included_files = ["node_modules/**"]
   node_bundler = "esbuild"
 
 [[redirects]]
