@@ -28,14 +28,15 @@ async function connectToDatabase() {
   await connectionPromise;
 }
 
-const expressHandler = serverless(app);
+const expressHandler = serverless(app, {
+  basePath: "/.netlify/functions/api",
+});
 
 exports.handler = async (event, context) => {
   context.callbackWaitsForEmptyEventLoop = false;
 
   const requestPath = event.path || "";
 
-  // La ruta de salud no necesita conectarse a MongoDB
   if (!requestPath.endsWith("/health")) {
     await connectToDatabase();
   }
