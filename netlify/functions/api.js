@@ -14,10 +14,15 @@ async function connectToDatabase() {
   }
 
   if (!connectionPromise) {
-    connectionPromise = mongoose.connect(config.databaseUrl).catch((error) => {
-      connectionPromise = null;
-      throw error;
-    });
+    connectionPromise = mongoose
+      .connect(config.databaseUrl, {
+        serverSelectionTimeoutMS: 5000,
+      })
+      .catch((error) => {
+        connectionPromise = null;
+        console.error("MongoDB connection error:", error);
+        throw error;
+      });
   }
 
   await connectionPromise;
@@ -28,7 +33,12 @@ const expressHandler = serverless(app);
 exports.handler = async (event, context) => {
   context.callbackWaitsForEmptyEventLoop = false;
 
-  await connectToDatabase();
+  const requestPath = event.path || "";
+
+  // La ruta de salud no necesita conectarse a MongoDB
+  if (!requestPath.endsWith("/health")) {
+    await connectToDatabase();
+  }
 
   return expressHandler(event, context);
 };
