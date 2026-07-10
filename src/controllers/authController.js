@@ -4,7 +4,7 @@ const { createAccessToken } = require("../services/tokenService");
 
 const HASH_ROUNDS = 12;
 const INVALID_LOGIN = { code: "INVALID_CREDENTIALS", message: "Invalid email or password" };
-const dummyHash = bcrypt.hash("not-a-real-user-password", HASH_ROUNDS);
+const DUMMY_PASSWORD_HASH = "$2b$12$k7hriV7ear33pBI8hYegguV7bhWA7NRUFMftm7Y/86gFaM.SBUNPW";
 
 function publicUser(user) {
   return { id: user.id, name: user.name, email: user.email, role: user.role };
@@ -39,7 +39,8 @@ async function register(req, res) {
 async function login(req, res) {
   const { email, password } = req.credentials;
   const user = await User.findOne({ email }).select("+passwordHash name email role isActive");
-  const passwordMatches = await bcrypt.compare(password, user?.passwordHash || await dummyHash);
+  const passwordHash = user?.passwordHash || DUMMY_PASSWORD_HASH;
+  const passwordMatches = await bcrypt.compare(password, passwordHash);
 
   if (!user?.isActive || !passwordMatches) {
     return res.status(401).json({ error: INVALID_LOGIN });

@@ -36,8 +36,9 @@ exports.handler = async (event, context) => {
   context.callbackWaitsForEmptyEventLoop = false;
 
   const requestPath = event.path || "";
+  const isCorsPreflight = event.httpMethod === "OPTIONS";
 
-  if (!requestPath.endsWith("/health")) {
+  if (!isCorsPreflight && !requestPath.endsWith("/health")) {
     await connectToDatabase();
   }
 
