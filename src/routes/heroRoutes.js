@@ -6,6 +6,7 @@ const authenticate = require("../middleware/authenticate");
 
 const router = express.Router();
 
+router.get("/mine", authenticate, asyncHandler(controller.listMine));
 router.route("/")
   .get(asyncHandler(controller.list))
   .post(authenticate, validateHero, asyncHandler(controller.create));

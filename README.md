@@ -50,6 +50,7 @@ Los tokens expiran por defecto en 15 minutos. Las contraseñas se procesan con b
 | Método | Ruta | Acción |
 | --- | --- | --- |
 | GET | `/api/v1/heroes?page=1&limit=20&search=storm` | Lista paginada |
+| GET | `/api/v1/heroes/mine` | Personajes del usuario autenticado |
 | POST | `/api/v1/heroes` | Crear un héroe (autenticado) |
 | GET | `/api/v1/heroes/:id` | Obtener un héroe |
 | PUT | `/api/v1/heroes/:id` | Reemplazar sus datos (autenticado) |
@@ -73,6 +74,12 @@ Ejemplo JSON para crear o actualizar:
 También puede crearse el héroe con una imagen en una sola petición `multipart/form-data`. Envía `name`, `description`, `powers` y `weakness` como campos de texto, y el archivo como `image`. Se aceptan JPEG, PNG, WebP y GIF, hasta 5 MB.
 
 Las rutas antiguas bajo `/api` siguen disponibles temporalmente para facilitar la migración, pero están deprecadas.
+
+### Propiedad y visibilidad
+
+Todos los personajes son públicos para lectura. Al crear uno, la API guarda el `ownerId` de la cuenta autenticada. `/api/v1/heroes/mine` devuelve únicamente los personajes de esa cuenta, por lo que la lista se sincroniza entre dispositivos.
+
+Solo el propietario puede editar, reemplazar la imagen o eliminar su personaje. Un usuario no puede modificar personajes ajenos; los administradores son la excepción. Los documentos históricos sin `ownerId` continúan visibles públicamente, pero solo un administrador puede modificarlos hasta que se les asigne propietario.
 
 ## Pruebas
 

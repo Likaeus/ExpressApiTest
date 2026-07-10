@@ -12,8 +12,8 @@ router.post("/addCharacter/image", authenticate, (req, res, next) => {
   req.params.id = req.body._id;
   return asyncHandler(controller.uploadImage)(req, res, next);
 });
-router.get("/getAllCards", asyncHandler(controller.list));
-router.get("/getOneCard/:id", asyncHandler(controller.getOne));
+router.get("/getAllCards", asyncHandler(controller.listLegacy));
+router.get("/getOneCard/:id", asyncHandler(controller.getOneLegacy));
 router.get("/image/:id", asyncHandler(controller.getImage));
 router.put("/updateCard/:id", authenticate, validateHero, asyncHandler(controller.update));
 router.delete("/deleteCard/:id", authenticate, asyncHandler(controller.remove));

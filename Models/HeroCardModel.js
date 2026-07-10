@@ -12,6 +12,11 @@ const heroCardSchema = new mongoose.Schema(
       data: { type: Buffer, select: false },
       contentType: String,
     },
+    ownerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      default: null,
+      index: true,
+    },
   },
   { versionKey: false, timestamps: true }
 );
