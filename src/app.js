@@ -3,7 +3,7 @@ const cors = require("cors");
 const morgan = require("morgan");
 const fileUpload = require("express-fileupload");
 const helmet = require("helmet");
-const { rateLimit } = require("express-rate-limit");
+const { rateLimit, ipKeyGenerator } = require("express-rate-limit");
 const config = require("./config");
 const heroRoutes = require("./routes/heroRoutes");
 const authRoutes = require("./routes/authRoutes");
@@ -18,18 +18,42 @@ app.use(morgan(config.nodeEnv === "production" ? "combined" : "dev"));
 app.use(cors({ origin: config.corsOrigin }));
 app.use(express.json({ limit: "100kb" }));
 app.use(express.urlencoded({ extended: false, limit: "100kb" }));
-app.use(fileUpload({
-  abortOnLimit: true,
-  limits: { fileSize: config.maxImageSize },
-  safeFileNames: true,
-}));
-app.use(rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 300,
-  standardHeaders: "draft-8",
-  legacyHeaders: false,
-  message: { error: { code: "RATE_LIMITED", message: "Too many requests" } },
-}));
+app.use(
+  fileUpload({
+    abortOnLimit: true,
+    limits: { fileSize: config.maxImageSize },
+    safeFileNames: true,
+  }),
+);
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 300,
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+
+    keyGenerator: (req) => {
+      const forwardedFor = req.headers["x-forwarded-for"];
+
+      const forwardedIp =
+        typeof forwardedFor === "string"
+          ? forwardedFor.split(",")[0].trim()
+          : undefined;
+
+      const clientIp =
+        req.ip || req.socket?.remoteAddress || forwardedIp || "127.0.0.1";
+
+      return ipKeyGenerator(clientIp);
+    },
+
+    message: {
+      error: {
+        code: "RATE_LIMITED",
+        message: "Too many requests",
+      },
+    },
+  }),
+);
 
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });
