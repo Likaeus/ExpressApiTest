@@ -17,5 +17,6 @@ router.route("/:id")
 router.route("/:id/image")
   .get(asyncHandler(controller.getImage))
   .put(authenticate, asyncHandler(controller.uploadImage));
+router.get("/:id/image/mine", authenticate, asyncHandler(controller.getOwnedImage));
 
 module.exports = router;

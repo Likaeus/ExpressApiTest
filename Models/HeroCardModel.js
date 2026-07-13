@@ -17,6 +17,8 @@ const heroCardSchema = new mongoose.Schema(
       default: null,
       index: true,
     },
+    creatorName: { type: String, trim: true, maxlength: 100, default: "" },
+    visibility: { type: String, enum: ["public", "private"], default: "public", index: true },
   },
   { versionKey: false, timestamps: true }
 );

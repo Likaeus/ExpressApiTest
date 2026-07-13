@@ -18,6 +18,7 @@ function serialize(campaign, currentUserId) {
   const isOwner = Boolean(currentUserId && value.ownerId?.toString() === currentUserId.toString());
   return {
     id: value._id, name: value.name, slug: value.slug,
+    creatorName: value.creatorName || "Comunidad del enclave",
     shortDescription: value.shortDescription, description: value.description,
     system: value.system, genres: value.genres, tone: value.tone,
     status: value.status, visibility: value.visibility,
@@ -68,7 +69,7 @@ async function listMine(req, res) {
 async function create(req, res) {
   const payload = req.campaignPayload;
   const campaign = await Campaign.create({
-    ...payload, ownerId: req.user._id,
+    ...payload, ownerId: req.user._id, creatorName: req.user.name,
     slug: await uniqueSlug(payload.name, req.user._id),
     publishedAt: payload.visibility === "public" ? new Date() : null,
   });

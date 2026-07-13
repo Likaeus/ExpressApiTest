@@ -14,6 +14,7 @@ test("normalizes both the new and legacy payload formats", () => {
     name: "Storm",
     description: "Mutant",
     details: { powers: "Weather", weakness: "Claustrophobia" },
+    visibility: "public",
   });
 });
 

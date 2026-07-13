@@ -11,6 +11,11 @@ test("hero schema stores an indexed owner id", () => {
   assert.equal(ownerPath.options.index, true);
 });
 
+test("hero schema supports private creations and creator attribution", () => {
+  assert.deepEqual(Hero.schema.path("visibility").enumValues, ["public", "private"]);
+  assert.ok(Hero.schema.path("creatorName"));
+});
+
 test("regular users can only mutate heroes they own", () => {
   const userId = new mongoose.Types.ObjectId();
   assert.deepEqual(ownershipFilter("hero-id", { _id: userId, role: "user" }), {
@@ -37,4 +42,6 @@ test("serialized heroes identify ownership without exposing ownerId", () => {
   const result = serialize(hero, ownerId);
   assert.equal(result.isOwnedByCurrentUser, true);
   assert.equal("ownerId" in result, false);
+  assert.equal(result.visibility, "public");
+  assert.equal(result.creatorName, "Comunidad del enclave");
 });

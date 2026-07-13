@@ -12,7 +12,9 @@ function serialize(hero, currentUserId) {
       powers: value.Details.Powers,
       weakness: value.Details.Weakness,
     },
-    imageUrl: value.Image?.contentType ? `/api/v1/heroes/${value._id}/image` : null,
+    imageUrl: value.Image?.contentType ? `/api/v1/heroes/${value._id}/image${value.visibility === "private" && currentUserId ? "/mine" : ""}` : null,
+    creatorName: value.creatorName || "Comunidad del enclave",
+    visibility: value.visibility || "public",
     isOwnedByCurrentUser: Boolean(
       currentUserId && value.ownerId && value.ownerId.toString() === currentUserId.toString()
     ),
@@ -29,6 +31,7 @@ function databasePayload(payload) {
       Powers: payload.details.powers,
       Weakness: payload.details.weakness,
     },
+    visibility: payload.visibility,
   };
 }
 
@@ -53,7 +56,7 @@ function ownershipFilter(id, user) {
 }
 
 async function create(req, res) {
-  const heroData = { ...databasePayload(req.heroPayload), ownerId: req.user._id };
+  const heroData = { ...databasePayload(req.heroPayload), ownerId: req.user._id, creatorName: req.user.name };
   const image = req.files?.image || req.files?.Image;
 
   if (image) {
@@ -73,9 +76,8 @@ async function create(req, res) {
 async function list(req, res) {
   const page = positiveInteger(req.query.page, 1);
   const limit = positiveInteger(req.query.limit, 20, 100);
-  const filter = req.query.search
-    ? { Name: { $regex: String(req.query.search).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), $options: "i" } }
-    : {};
+  const filter = { visibility: { $ne: "private" } };
+  if (req.query.search) filter.Name = { $regex: String(req.query.search).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), $options: "i" };
   const [heroes, total] = await Promise.all([
     Hero.find(filter).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit).lean(),
     Hero.countDocuments(filter),
@@ -85,7 +87,7 @@ async function list(req, res) {
 }
 
 async function getOne(req, res) {
-  const hero = await Hero.findById(req.params.id).lean();
+  const hero = await Hero.findOne({ _id: req.params.id, visibility: { $ne: "private" } }).lean();
   if (!hero) return res.status(404).json({ error: { code: "HERO_NOT_FOUND", message: "Hero not found" } });
   res.json({ data: serialize(hero) });
 }
@@ -150,12 +152,20 @@ async function uploadImage(req, res) {
 }
 
 async function getImage(req, res) {
-  const hero = await Hero.findById(req.params.id).select("+Image.data").lean();
+  const hero = await Hero.findOne({ _id: req.params.id, visibility: { $ne: "private" } }).select("+Image.data").lean();
   if (!hero?.Image?.data) return res.status(404).json({ error: { code: "IMAGE_NOT_FOUND", message: "Image not found" } });
   const imageData = Buffer.isBuffer(hero.Image.data)
     ? hero.Image.data
     : Buffer.from(hero.Image.data.buffer);
   res.set({ "Content-Type": hero.Image.contentType, "Cache-Control": "public, max-age=86400" });
+  res.end(imageData);
+}
+
+async function getOwnedImage(req, res) {
+  const hero = await Hero.findOne(ownershipFilter(req.params.id, req.user)).select("+Image.data").lean();
+  if (!hero?.Image?.data) return res.status(404).json({ error: { code: "IMAGE_NOT_FOUND", message: "Image not found" } });
+  const imageData = Buffer.isBuffer(hero.Image.data) ? hero.Image.data : Buffer.from(hero.Image.data.buffer);
+  res.set({ "Content-Type": hero.Image.contentType, "Cache-Control": "private, max-age=300" });
   res.end(imageData);
 }
 
@@ -168,6 +178,7 @@ module.exports = {
   remove,
   uploadImage,
   getImage,
+  getOwnedImage,
   listLegacy,
   getOneLegacy,
   serialize,

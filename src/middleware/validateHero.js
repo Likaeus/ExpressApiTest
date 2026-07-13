@@ -15,6 +15,7 @@ function normalizeHeroPayload(body = {}) {
       powers: text(details.powers ?? details.Powers ?? body.powers ?? body.Powers),
       weakness: text(details.weakness ?? details.Weakness ?? body.weakness ?? body.Weakness),
     },
+    visibility: body.visibility === "private" ? "private" : "public",
   };
 }
 

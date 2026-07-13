@@ -59,7 +59,7 @@ async function streamHeroImage(request, imageId) {
 
   try {
     await connectToDatabase();
-    const hero = await Hero.findById(imageId).select("+Image.data Image.contentType updatedAt").lean();
+    const hero = await Hero.findOne({ _id: imageId, visibility: { $ne: "private" } }).select("+Image.data Image.contentType updatedAt").lean();
 
     if (!hero?.Image?.data) {
       return Response.json(

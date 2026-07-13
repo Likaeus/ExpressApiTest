@@ -4,6 +4,7 @@ const config = require("../config");
 const campaignSchema = new mongoose.Schema(
   {
     ownerId: { type: mongoose.Schema.Types.ObjectId, required: true, index: true },
+    creatorName: { type: String, trim: true, maxlength: 100, default: "" },
     name: { type: String, required: true, trim: true, maxlength: 120 },
     slug: { type: String, required: true, trim: true, maxlength: 150 },
     shortDescription: { type: String, required: true, trim: true, maxlength: 240 },
